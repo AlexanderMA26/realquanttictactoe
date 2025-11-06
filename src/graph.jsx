@@ -1,13 +1,10 @@
 
 class Graph {
-    // defining vertex array and
-    // adjacent list
 
     constructor() {
         this.noOfVertices = 9;
         this.AdjList = new Map();
 
-        // add 9 vertices (0 through 8)
         for (let i = 0; i < 9; i++) {
             this.addVertex(i);
         }

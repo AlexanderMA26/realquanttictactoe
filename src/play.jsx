@@ -1,12 +1,8 @@
 import Graph from './graph';
+import { useState, useEffect } from 'react'
 
-function createGraph(){
+function play(){
 
-const g = new Graph;
-
-g.addEdge(0, 1);
-g.addEdge(1, 2);
-return g.printGraph();
 }
 
-export default createGraph;
+export default play;
