@@ -2,25 +2,22 @@ import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import play from './play'
 import Graph from './graph';
+import gameBoard from './play'
 
 function App() {
-  const [count, setCount] = useState(0)
-  const g = new Graph;
+  const [board] = useState(() => new gameBoard()); 
+  const [result, setResult] = useState("");
     
-  useEffect(() => {
-    play(); 
-  }, [])
 
   return (
     <>
       <h1>Tic Tac Toe connections</h1>
       <div className="card">
-        <button onClick={handleClick(1, 2)}>
+        <button onClick={() => setResult(board.handleClick(1, 2))}>
           1-2
         </button>
-        <button onClick={handleClick(2, 3)}>
+        <button onClick={() => setResult(board.handleClick(1, 2))}>
           2-3
         </button>
         <p>
