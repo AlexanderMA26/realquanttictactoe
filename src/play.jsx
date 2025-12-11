@@ -14,4 +14,10 @@ export default class gameBoard{
 }
 
 
+function Board({xIsNext, squares, onPlay}){
+
+    
+}
+
+
 
