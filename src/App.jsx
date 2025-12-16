@@ -1,79 +1,83 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Graph from './graph';
-import gameBoard from './play'
+import { useState } from 'react';
+import './App.css';
 
 function App() {
-  const [board] = useState(() => new gameBoard()); 
-  const [result, setResult] = useState("");
-    
+  const [xIsNext, setXIsNext] = useState(true);
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handlePlay(nextSquares) {
+    setSquares(nextSquares);
+    setXIsNext(prev => !prev); // switch player AFTER two squares
+  }
 
   return (
     <>
-      <h1>Tic Tac Toe connections</h1>
-      <div className="card">
-        <button onClick={() => setResult(board.handleClick(1, 2))}>
-          1-2
-        </button>
-        <button onClick={() => setResult(board.handleClick(2, 3))}>
-          2-3
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
+      <h1>Tic Tac Toe Connections</h1>
+      <Board
+        xIsNext={xIsNext}
+        squares={squares}
+        onPlay={handlePlay}
+      />
     </>
-  )
+  );
 }
 
-function handleClick(num1, num2){
-    
-}
+function Board({ xIsNext, squares, onPlay }) {
+  const [pendingSquares, setPendingSquares] = useState([]);
 
-function Board({xIsNext, squares, onPlay}) {
-  //Either updates the board or declares a winner
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]){
-      return;
-    }
-    //Finds which shape is next
-    if (xIsNext){
-      nextSquares[i] = 'X';
-    }else{
-      nextSquares[i] = 'O';
-    }
-    onPlay(nextSquares);
-  }
-  const winner = calculateWinner(squares);
-  let status;
-  if (winner) {
-    status = "Winner: " + winner;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
-  }
-  return (
+    // Stop if game over or square already taken
+    if (squares[i]) return;
 
-    //Sets up game board
-  <>
-  <div className='status'>{status}</div>
- <div className="board-row">
+    // Prevent touching the same square twice in one turn
+    if (pendingSquares.includes(i)) return;
+
+    const newPending = [...pendingSquares, i];
+    setPendingSquares(newPending);
+
+    // Only apply moves after TWO different squares are touched
+    if (newPending.length === 2) {
+      const nextSquares = squares.slice();
+      const mark = xIsNext ? 'X' : 'O';
+
+      newPending.forEach(index => {
+        nextSquares[index] = mark;
+      });
+
+      setPendingSquares([]);   // reset for next player
+      onPlay(nextSquares);     // this will flip xIsNext
+    }
+  }
+
+  //const winner = calculateWinner(squares);
+  let status;
+
+  //if (winner) {
+    //status = "Winner: " + winner;
+  //} else {
+    //status = `Next player: ${xIsNext ? "X" : "O"} (select 2 squares)`;
+  //}
+
+  return (
+    <>
+      <div className="status">{status}</div>
+
+      <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
         <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
       </div>
       <div className="board-row">
-      <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-      <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-      <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
+        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
+        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
+        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
       </div>
       <div className="board-row">
-      <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-      <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-      <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
+        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
+        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
       </div>
-  </>
+    </>
   );
 }
 
