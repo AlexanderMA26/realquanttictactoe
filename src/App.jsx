@@ -7,7 +7,7 @@ function App() {
 
   function handlePlay(nextSquares) {
     setSquares(nextSquares);
-    setXIsNext(prev => !prev); // switch player AFTER two squares
+    setXIsNext(prev => !prev); 
   }
 
   return (
@@ -26,16 +26,14 @@ function Board({ xIsNext, squares, onPlay }) {
   const [pendingSquares, setPendingSquares] = useState([]);
 
   function handleClick(i) {
-    // Stop if game over or square already taken
+
     if (squares[i]) return;
 
-    // Prevent touching the same square twice in one turn
     if (pendingSquares.includes(i)) return;
 
     const newPending = [...pendingSquares, i];
     setPendingSquares(newPending);
-
-    // Only apply moves after TWO different squares are touched
+    
     if (newPending.length === 2) {
       const nextSquares = squares.slice();
       const mark = xIsNext ? 'X' : 'O';
@@ -44,9 +42,25 @@ function Board({ xIsNext, squares, onPlay }) {
         nextSquares[index] = mark;
       });
 
-      setPendingSquares([]);   // reset for next player
-      onPlay(nextSquares);     // this will flip xIsNext
+      setPendingSquares([]);   
+      onPlay(nextSquares);    
     }
+    let numClicks = 0;
+
+
+    const nextSquares = squares.slice();
+     
+
+
+    //Finds which shape is next
+    if (xIsNext){
+      nextSquares[i] = 'X';
+      numClicks += 1;
+    }else{
+      nextSquares[i] = 'O';
+      numClicks += 1;
+    }
+    onPlay(nextSquares);
   }
 
   //const winner = calculateWinner(squares);
