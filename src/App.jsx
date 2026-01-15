@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './App.css';
+import Graph from './graph';
 
 function App() {
   const [xIsNext, setXIsNext] = useState(true);
@@ -37,6 +38,7 @@ function Board({ xIsNext, squares, onPlay }) {
     if (newPending.length === 2) {
       const nextSquares = squares.slice();
       const mark = xIsNext ? 'X' : 'O';
+    
 
       newPending.forEach(index => {
         nextSquares[index] = mark;
@@ -46,6 +48,7 @@ function Board({ xIsNext, squares, onPlay }) {
       onPlay(nextSquares);    
     }
     let numClicks = 0;
+  
 
 
     const nextSquares = squares.slice();
