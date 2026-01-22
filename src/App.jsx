@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import './App.css';
 import Graph from './graph';
 
@@ -6,9 +6,12 @@ function App() {
   const [xIsNext, setXIsNext] = useState(true);
   const [squares, setSquares] = useState(Array(9).fill(null));
 
+  // Persistent graph instance (does not reset on re-render)
+  const graphRef = useRef(new Graph());
+
   function handlePlay(nextSquares) {
     setSquares(nextSquares);
-    setXIsNext(prev => !prev); 
+    setXIsNext(prev => !prev);
   }
 
   return (
@@ -18,67 +21,51 @@ function App() {
         xIsNext={xIsNext}
         squares={squares}
         onPlay={handlePlay}
+        graph={graphRef.current}
       />
     </>
   );
 }
 
-function Board({ xIsNext, squares, onPlay }) {
+function Board({ xIsNext, squares, onPlay, graph }) {
   const [pendingSquares, setPendingSquares] = useState([]);
 
   function handleClick(i) {
-
+    // Do not allow selecting an already collapsed square
     if (squares[i]) return;
 
+    // Prevent selecting the same square twice in one turn
     if (pendingSquares.includes(i)) return;
 
     const newPending = [...pendingSquares, i];
     setPendingSquares(newPending);
-    
+
+    // When two squares are selected, complete the quantum move
     if (newPending.length === 2) {
       const nextSquares = squares.slice();
       const mark = xIsNext ? 'X' : 'O';
-    
 
+      // Place the mark on both squares
       newPending.forEach(index => {
         nextSquares[index] = mark;
       });
 
-      setPendingSquares([]);   
-      onPlay(nextSquares);    
+      // Add edge to the graph
+      const [v, w] = newPending;
+      graph.addEdge(v, w);
+
+      // Debug output
+      console.log(`Edge added between ${v} and ${w}`);
+      graph.printGraph();
+
+      // Reset for next turn
+      setPendingSquares([]);
+      onPlay(nextSquares);
     }
-    let numClicks = 0;
-  
-
-
-    const nextSquares = squares.slice();
-     
-
-
-    //Finds which shape is next
-    if (xIsNext){
-      nextSquares[i] = 'X';
-      numClicks += 1;
-    }else{
-      nextSquares[i] = 'O';
-      numClicks += 1;
-    }
-    onPlay(nextSquares);
   }
-
-  //const winner = calculateWinner(squares);
-  let status;
-
-  //if (winner) {
-    //status = "Winner: " + winner;
-  //} else {
-    //status = `Next player: ${xIsNext ? "X" : "O"} (select 2 squares)`;
-  //}
 
   return (
     <>
-      <div className="status">{status}</div>
-
       <div className="board-row">
         <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
         <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
@@ -100,7 +87,10 @@ function Board({ xIsNext, squares, onPlay }) {
 
 function Square({ value, onSquareClick }) {
   return (
-    <button className="square" onClick={onSquareClick}>{value}</button>
+    <button className="square" onClick={onSquareClick}>
+      {value}
+    </button>
   );
 }
-export default App
+
+export default App;
