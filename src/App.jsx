@@ -3,10 +3,10 @@ import './App.css';
 import Graph from './graph';
 
 function App() {
+  //Board setiup
   const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill(null));
+  const [squares, setSquares] = useState(Array(9).fill([]));
 
-  // Persistent graph instance (does not reset on re-render)
   const graphRef = useRef(new Graph());
 
   function handlePlay(nextSquares) {
@@ -16,7 +16,7 @@ function App() {
 
   return (
     <>
-      <h1>Tic Tac Toe Connections</h1>
+      <h1>Tic Tac Toe</h1>
       <Board
         xIsNext={xIsNext}
         squares={squares}
@@ -31,65 +31,81 @@ function Board({ xIsNext, squares, onPlay, graph }) {
   const [pendingSquares, setPendingSquares] = useState([]);
 
   function handleClick(i) {
-    // Do not allow selecting an already collapsed square
-    if (squares[i]) return;
-
-    // Prevent selecting the same square twice in one turn
-    if (pendingSquares.includes(i)) return;
-
+    console.log('Click on square:', i);
+    console.log('Current squares:', squares);
+    console.log('Pending squares:', pendingSquares);
+    
+    //don't allow double selects
+    if (pendingSquares.includes(i)) {
+      console.log('Square already pending');
+      return;
+    }
+    //adds click to list of clicks
     const newPending = [...pendingSquares, i];
     setPendingSquares(newPending);
+    console.log('New pending:', newPending);
 
-    // When two squares are selected, complete the quantum move
+    // Wait two clicks
     if (newPending.length === 2) {
       const nextSquares = squares.slice();
       const mark = xIsNext ? 'X' : 'O';
 
-      // Place the mark on both squares
       newPending.forEach(index => {
         nextSquares[index] = mark;
       });
 
-      // Add edge to the graph
+      // Add edge
       const [v, w] = newPending;
       graph.addEdge(v, w);
 
-      // Debug output
-      console.log(`Edge added between ${v} and ${w}`);
       graph.printGraph();
 
-      // Reset for next turn
+      // Reset squares
       setPendingSquares([]);
       onPlay(nextSquares);
     }
   }
+  //show squares
+  const displaySquares = squares.map((square, index) => {
+    if (square) return square;
+    if (pendingSquares.includes(index)) {
+      return xIsNext ? 'X' : 'O';
+    }
+    return null;
+  });
+
+  console.log('Display squares:', displaySquares);
 
   return (
     <>
       <div className="board-row">
-        <Square value={squares[0]} onSquareClick={() => handleClick(0)} />
-        <Square value={squares[1]} onSquareClick={() => handleClick(1)} />
-        <Square value={squares[2]} onSquareClick={() => handleClick(2)} />
+        <Square value={displaySquares[0]} onSquareClick={() => handleClick(0)} />
+        <Square value={displaySquares[1]} onSquareClick={() => handleClick(1)} />
+        <Square value={displaySquares[2]} onSquareClick={() => handleClick(2)} />
       </div>
       <div className="board-row">
-        <Square value={squares[3]} onSquareClick={() => handleClick(3)} />
-        <Square value={squares[4]} onSquareClick={() => handleClick(4)} />
-        <Square value={squares[5]} onSquareClick={() => handleClick(5)} />
+        <Square value={displaySquares[3]} onSquareClick={() => handleClick(3)} />
+        <Square value={displaySquares[4]} onSquareClick={() => handleClick(4)} />
+        <Square value={displaySquares[5]} onSquareClick={() => handleClick(5)} />
       </div>
       <div className="board-row">
-        <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
-        <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
-        <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+        <Square value={displaySquares[6]} onSquareClick={() => handleClick(6)} />
+        <Square value={displaySquares[7]} onSquareClick={() => handleClick(7)} />
+        <Square value={displaySquares[8]} onSquareClick={() => handleClick(8)} />
       </div>
     </>
   );
 }
 
 function Square({ value, onSquareClick }) {
+  console.log('Rendering square with value:', value);
   return (
-    <button className="square" onClick={onSquareClick}>
-      {value}
-    </button>
+    //<button className="square" onClick={onSquareClick}>
+      //{value}
+    //</button>
+    <button className="square" onClick={onSquareClick} style={{color: 'black', border: '1px solid black', minWidth: '50px', minHeight: '50px'}}>
+  {value || '.'} 
+</button>
   );
 }
 
