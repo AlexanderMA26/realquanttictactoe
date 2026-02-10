@@ -5,7 +5,7 @@ import Graph from './graph';
 function App() {
   //Board setiup
   const [xIsNext, setXIsNext] = useState(true);
-  const [squares, setSquares] = useState(Array(9).fill([]));
+  const [squares, setSquares] = useState(Array(9).fill([null]));
 
   const graphRef = useRef(new Graph());
 
@@ -51,7 +51,7 @@ function Board({ xIsNext, squares, onPlay, graph }) {
       const mark = xIsNext ? 'X' : 'O';
 
       newPending.forEach(index => {
-        nextSquares[index] = mark;
+        nextSquares[index] += mark;
       });
 
       // Add edge
